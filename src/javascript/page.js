@@ -18,50 +18,67 @@ function transpose(matrix) {
 document.addEventListener('DOMContentLoaded', function documentLoaded() {
     var players = ['red', 'blue'],
         currentPlayerIndex = 0,
+        turn = elements('.turn')[0],
         fields = elements('.board .field'),
-        resetButton = elements('.reset')[0];
+        resetButton = elements('.reset')[0],
+        result = elements('.result')[0];
 
     fields.forEach(function(field) {
         field.addEventListener('change', function() {
 
             if (field.checked) {
                 field.value = players[currentPlayerIndex];
+                field.disabled = true;
                 field.parentElement.bgColor = players[currentPlayerIndex];
                 currentPlayerIndex = nextPlayerIndex(players, currentPlayerIndex);
             } else {
                 field.value = '';
+                field.disabled = false;
                 field.parentElement.bgColor = 'white';
             }
 
-            checkGameState(players, fields);
+            checkGameState(players, fields, result, turn, currentPlayerIndex);
         });
     });
 
     resetButton.addEventListener('click', function() {
-        resetGame(fields);
+        resetGame(fields, result);
     });
+
+    checkGameState(players, fields, result, turn, currentPlayerIndex);
 });
 
 function nextPlayerIndex(players, index) {
     return ((players.length - 1) > index) ? index + 1 : 0;
 }
 
-function checkGameState(players, fields) {
-    if (isGameFinished(players)) {
-        fields.forEach(function(field) {
-            field.disabled = true;
-        });
+function checkGameState(players, fields, result, turn, currentPlayerIndex) {
+    var winner = hasPlayerWon(players);
+
+    if (winner) {
+        result.innerHTML = 'winner: ' + winner;
+        turn.innerHTML = '';
+        disableFields(fields);
+    } else if (areAllValuesSet()) {
+        result.innerHTML = 'draw';
+        turn.innerHTML = '';
+        disableFields(fields);
     } else {
-        fields.forEach(function(field) {
-            field.disabled = false;
-        });
+        turn.innerHTML = players[currentPlayerIndex];
     }
 }
 
-function resetGame(fields) {
+function disableFields(fields) {
+    fields.forEach(function(field) {
+        field.disabled = true;
+    });
+}
+
+function resetGame(fields, result) {
     fields.forEach(function(field) {
         uncheckField(field);
     });
+    result.innerHTML = '';
 }
 
 function uncheckField(field) {
@@ -73,9 +90,9 @@ function uncheckField(field) {
     }));
 }
 
-function isGameFinished(players) {
-    return areAllValuesSet() || hasPlayerWon(players);
-}
+// function isGameFinished(players) {
+//     return () || hasPlayerWon(players);
+// }
 
 function areAllValuesSet() {
     return elements('.board .field:not(:checked)').length === 0;
@@ -88,7 +105,7 @@ function hasPlayerWon(players) {
         return (hasCompleteRow(values)
             || hasCompleteColumn(values)
             || hasCompleteDiagonal(values));
-    }).length;
+    })[0];
 }
 
 // returns a matrix of values
