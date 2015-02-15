@@ -16,12 +16,28 @@ function transpose(matrix) {
 }
 
 document.addEventListener('DOMContentLoaded', function documentLoaded() {
-    var fields = elements('.board .field'),
+    var players = ['red', 'blue'],
+        currentPlayerIndex = 0,
+        fields = elements('.board .field'),
         resetButton = elements('.reset')[0];
 
     fields.forEach(function(field) {
         field.addEventListener('change', function() {
-            checkGameState(fields, resetButton);
+
+            if (field.checked) {
+                field.value = players[currentPlayerIndex];
+                field.parentElement.bgColor = players[currentPlayerIndex];
+                currentPlayerIndex = nextPlayerIndex(players, currentPlayerIndex);
+            } else {
+                field.value = '';
+                field.parentElement.bgColor = 'white';
+            }
+
+            checkGameState({
+                players: players,
+                fields: fields,
+                resetButton: resetButton
+            });
         });
     });
 
@@ -30,24 +46,41 @@ document.addEventListener('DOMContentLoaded', function documentLoaded() {
     });
 });
 
-function checkGameState(fields, resetButton) {
-    if (isGameFinished()) {
-        fields.forEach(function(field) {
+function nextPlayerIndex(players, index) {
+    return ((players.length - 1) > index) ? index + 1 : 0;
+}
+
+// takes options with players, fields, resetButton
+function checkGameState(options) {
+    if (isGameFinished(options.players)) {
+        options.fields.forEach(function(field) {
             field.disabled = true;
         });
-        resetButton.disabled = false;
+        options.resetButton.disabled = false;
     } else {
-        fields.forEach(function(field) {
+        options.fields.forEach(function(field) {
             field.disabled = false;
         });
-        resetButton.disabled = true;
+        options.resetButton.disabled = true;
     }
 }
 
-function isGameFinished() {
-    return (hasCompleteRow(values())
-        || hasCompleteColumn(values())
-        || hasCompleteDiagonal(values()));
+function isGameFinished(players) {
+    return areAllValuesSet() || hasPlayerWon(players);
+}
+
+function areAllValuesSet() {
+    return elements('.board .field:not(:checked)').length === 0;
+}
+
+function hasPlayerWon(players) {
+    return players.filter(function(player) {
+        var values = playerValues(player);
+
+        return (hasCompleteRow(values)
+            || hasCompleteColumn(values)
+            || hasCompleteDiagonal(values));
+    }).length;
 }
 
 function resetGame(fields) {
@@ -66,23 +99,23 @@ function uncheckField(field) {
 }
 
 // returns a matrix of values
-function values() {
+function playerValues(player) {
     return elements('.board tr').map(function(row) {
-        return rowValues(row);
+        return rowValues(row, player);
     });
 }
 
 // returns array of values from table row
-function rowValues(row) {
+function rowValues(row, player) {
     return elements('.field', row).map(function(field) {
-        return field.checked;
+        return field.checked && field.value === player;
     });
 }
 
 function hasCompleteRow(values) {
     return values.filter(function(row) {
         return checkRow(row);
-    }).length > 0;
+    }).length;
 }
 
 // returns if all row values are true
