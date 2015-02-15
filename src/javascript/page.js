@@ -16,17 +16,20 @@ function transpose(matrix) {
 }
 
 document.addEventListener('DOMContentLoaded', function documentLoaded() {
-    var fields = elements('.board .field');
+    var fields = elements('.board .field'),
+        resetButton = elements('.reset')[0];
 
     fields.forEach(function(field) {
         field.addEventListener('change', checkGameState);
     });
 
+    resetButton.addEventListener('click', function() {
+        resetGame(fields);
+    });
 });
 
 function checkGameState() {
-    console.log('checking game state...');
-    // console.log('claimedFields', fieldValues());
+    // console.log('checking game state...');
 
     if (checkRows(values())
         || checkColumns(values())
@@ -34,6 +37,21 @@ function checkGameState() {
     {
         console.log('game finished');
     }
+}
+
+function resetGame(fields) {
+    fields.forEach(function(field) {
+        uncheckField(field);
+    });
+}
+
+function uncheckField(field) {
+    field.checked = false;
+    field.dispatchEvent(new Event('change', {
+        'view': window,
+        'bubbles': true,
+        'cancelable': true
+    }));
 }
 
 // returns a matrix of values
