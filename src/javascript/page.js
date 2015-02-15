@@ -36,7 +36,6 @@ document.addEventListener('DOMContentLoaded', function documentLoaded() {
             checkGameState({
                 players: players,
                 fields: fields,
-                resetButton: resetButton
             });
         });
     });
@@ -50,18 +49,16 @@ function nextPlayerIndex(players, index) {
     return ((players.length - 1) > index) ? index + 1 : 0;
 }
 
-// takes options with players, fields, resetButton
+// takes options with players, fields
 function checkGameState(options) {
     if (isGameFinished(options.players)) {
         options.fields.forEach(function(field) {
             field.disabled = true;
         });
-        options.resetButton.disabled = false;
     } else {
         options.fields.forEach(function(field) {
             field.disabled = false;
         });
-        options.resetButton.disabled = true;
     }
 }
 
