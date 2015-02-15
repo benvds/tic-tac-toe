@@ -1,165 +1,85 @@
+var _ = require('lodash'),
+    TicTacToe = require('./tictactoe');
+
+var indexOf = Array.prototype.indexOf,
+    slice = Array.prototype.slice;
+
 function toArray(subject) {
-    return Array.prototype.slice.call(subject);
+    return slice.call(subject);
 }
 
 function elements(selectors, subject) {
     return toArray((subject || document).querySelectorAll(selectors));
 }
 
-// transposes a matrix (swaps rows and columns)
-function transpose(matrix) {
-    return matrix.map(function(row, index, matrix) {
-        return matrix.map(function(row) {
-            return row[index];
-        });
-    });
-}
-
 document.addEventListener('DOMContentLoaded', function documentLoaded() {
-    var game = {
-            players: ['red', 'blue'],
-            currentPlayerIndex = 0
+    var UI = {
+            BOARD: elements('.board')[0],
+            FIELDS: elements('.field'),
+            TURN: elements('.turn')[0],
+            RESET_BUTTON: elements('.reset')[0],
+            RESULT: elements('.result')[0]
         },
-        ui: {
-            turn: elements('.turn')[0],
-            fields: elements('.board .field'),
-            resetButton: elements('.reset')[0],
-            result: elements('.result')[0]
-        };
+        state = TicTacToe.newState();
 
-    ui.fields.forEach(function(field) {
+    UI.FIELDS.forEach(function(field) {
         field.addEventListener('change', function() {
-            handleFieldChange(game, ui, field)
+            state = claimField(state, field);
+            updateUI(UI, state);
         });
     });
 
-    resetButton.addEventListener('click', function() {
-        uncheckFields(fields, result);
-        checkGameState(game, ui);
+    UI.RESET_BUTTON.addEventListener('click', function() {
+        UI.FIELDS.forEach(function(field) {
+            field.checked = false;
+            field.disabled = false;
+            field.parentElement.bgColor = 'white';
+        });
+        state = TicTacToe.newState();
+        updateUI(UI, state);
     });
 
-    checkGameState(game, ui);
+    updateUI(UI, state);
 });
 
-function handleFieldChange(game, ui, field) {
-    if (field.checked) {
-        field.value = currentPlayer(game);
-        field.disabled = true;
-        field.parentElement.bgColor = currentPlayer(game);
-        game.currentPlayerIndex = nextPlayerIndex(game);
+function claimField(state, field) {
+    field.disabled = true;
+    field.parentElement.bgColor = TicTacToe.currentPlayer(state);
+
+    return TicTacToe.claimPosition(state, inputFieldPosition(field));
+}
+
+// returns input field position in table: [x, y]
+function inputFieldPosition(field) {
+    var parentTableData = field.parentElement,
+        parentTableRow = parentTableData.parentElement;
+
+    return {
+        row: elementIndex(parentTableData),
+        column: elementIndex(parentTableRow)
+    };
+}
+
+function elementIndex(element) {
+    return indexOf.call(element.parentElement.children, element);
+}
+
+function updateUI(UI, state) {
+    if (TicTacToe.winner(state)) {
+        UI.RESULT.innerHTML = 'winner: ' + TicTacToe.winner(state);
+        UI.TURN.innerHTML = '';
+        disableFields(UI.FIELDS);
+    } else if (TicTacToe.isDraw(state)) {
+        UI.RESULT.innerHTML = 'draw';
+        UI.TURN.innerHTML = '';
+        disableFields(UI.FIELDS);
     } else {
-        field.value = '';
-        field.disabled = false;
-        field.parentElement.bgColor = 'white';
-    }
-
-    checkGameState(game, ui);
-}
-
-function currentPlayer(game) {
-    return game.players[game.currentPlayerIndex];
-}
-
-function nextPlayerIndex(game) {
-    return ((game.players.length - 1) > game.currentPlayerIndex) ?
-        game.currentPlayerIndex + 1 : 0;
-}
-
-function checkGameState(game, ui) {
-    var winner = hasPlayerWon(game.players);
-
-    if (winner) {
-        ui.result.innerHTML = 'winner: ' + winner;
-        ui.turn.innerHTML = '';
-        disableFields(ui.fields);
-    } else if (areAllValuesSet()) {
-        ui.result.innerHTML = 'draw';
-        ui.turn.innerHTML = '';
-        disableFields(ui.fields);
-    } else {
-        ui.turn.innerHTML = currentPlayer(game);
+        UI.TURN.innerHTML = TicTacToe.currentPlayer(state);
     }
 }
 
 function disableFields(fields) {
     fields.forEach(function(field) {
         field.disabled = true;
-    });
-}
-
-function uncheckFields(fields, result) {
-    fields.forEach(function(field) {
-        uncheckField(field);
-    });
-}
-
-function uncheckField(field) {
-    field.checked = false;
-    field.dispatchEvent(new Event('change', {
-        'view': window,
-        'bubbles': true,
-        'cancelable': true
-    }));
-}
-
-function areAllValuesSet() {
-    return elements('.board .field:not(:checked)').length === 0;
-}
-
-function hasPlayerWon(players) {
-    return players.filter(function(player) {
-        var values = playerValues(player);
-
-        return (hasCompleteRow(values)
-            || hasCompleteColumn(values)
-            || hasCompleteDiagonal(values));
-    })[0];
-}
-
-// returns a matrix of values
-function playerValues(player) {
-    return elements('.board tr').map(function(row) {
-        return rowValues(row, player);
-    });
-}
-
-// returns array of values from table row
-function rowValues(row, player) {
-    return elements('.field', row).map(function(field) {
-        return field.checked && field.value === player;
-    });
-}
-
-function hasCompleteRow(values) {
-    return values.filter(function(row) {
-        return checkRow(row);
-    }).length;
-}
-
-// returns if all row values are true
-function checkRow(row) {
-    return row.filter(function(value) {
-        return !value;
-    }).length === 0;
-}
-
-function hasCompleteColumn(values) {
-    return hasCompleteRow(transpose(values));
-}
-
-function hasCompleteDiagonal(values) {
-    return hasCompleteRow([diagonalValuesDescending(values),
-                          diagonalValuesAscending(values)]);
-}
-
-function diagonalValuesDescending(values) {
-    return values.map(function(row, index) {
-        return row[index];
-    });
-}
-
-function diagonalValuesAscending(values) {
-    return values.map(function(row, index) {
-        return row[(values.length - 1) - index];
     });
 }
