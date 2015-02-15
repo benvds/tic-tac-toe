@@ -16,55 +16,68 @@ function transpose(matrix) {
 }
 
 document.addEventListener('DOMContentLoaded', function documentLoaded() {
-    var players = ['red', 'blue'],
-        currentPlayerIndex = 0,
-        turn = elements('.turn')[0],
-        fields = elements('.board .field'),
-        resetButton = elements('.reset')[0],
-        result = elements('.result')[0];
+    var game = {
+            players: ['red', 'blue'],
+            currentPlayerIndex = 0
+        },
+        ui: {
+            turn: elements('.turn')[0],
+            fields: elements('.board .field'),
+            resetButton: elements('.reset')[0],
+            result: elements('.result')[0]
+        };
 
-    fields.forEach(function(field) {
+    ui.fields.forEach(function(field) {
         field.addEventListener('change', function() {
-
-            if (field.checked) {
-                field.value = players[currentPlayerIndex];
-                field.disabled = true;
-                field.parentElement.bgColor = players[currentPlayerIndex];
-                currentPlayerIndex = nextPlayerIndex(players, currentPlayerIndex);
-            } else {
-                field.value = '';
-                field.disabled = false;
-                field.parentElement.bgColor = 'white';
-            }
-
-            checkGameState(players, fields, result, turn, currentPlayerIndex);
+            handleFieldChange(game, ui, field)
         });
     });
 
     resetButton.addEventListener('click', function() {
-        resetGame(fields, result);
+        uncheckFields(fields, result);
+        checkGameState(game, ui);
     });
 
-    checkGameState(players, fields, result, turn, currentPlayerIndex);
+    checkGameState(game, ui);
 });
 
-function nextPlayerIndex(players, index) {
-    return ((players.length - 1) > index) ? index + 1 : 0;
+function handleFieldChange(game, ui, field) {
+    if (field.checked) {
+        field.value = currentPlayer(game);
+        field.disabled = true;
+        field.parentElement.bgColor = currentPlayer(game);
+        game.currentPlayerIndex = nextPlayerIndex(game);
+    } else {
+        field.value = '';
+        field.disabled = false;
+        field.parentElement.bgColor = 'white';
+    }
+
+    checkGameState(game, ui);
 }
 
-function checkGameState(players, fields, result, turn, currentPlayerIndex) {
-    var winner = hasPlayerWon(players);
+function currentPlayer(game) {
+    return game.players[game.currentPlayerIndex];
+}
+
+function nextPlayerIndex(game) {
+    return ((game.players.length - 1) > game.currentPlayerIndex) ?
+        game.currentPlayerIndex + 1 : 0;
+}
+
+function checkGameState(game, ui) {
+    var winner = hasPlayerWon(game.players);
 
     if (winner) {
-        result.innerHTML = 'winner: ' + winner;
-        turn.innerHTML = '';
-        disableFields(fields);
+        ui.result.innerHTML = 'winner: ' + winner;
+        ui.turn.innerHTML = '';
+        disableFields(ui.fields);
     } else if (areAllValuesSet()) {
-        result.innerHTML = 'draw';
-        turn.innerHTML = '';
-        disableFields(fields);
+        ui.result.innerHTML = 'draw';
+        ui.turn.innerHTML = '';
+        disableFields(ui.fields);
     } else {
-        turn.innerHTML = players[currentPlayerIndex];
+        ui.turn.innerHTML = currentPlayer(game);
     }
 }
 
@@ -74,11 +87,10 @@ function disableFields(fields) {
     });
 }
 
-function resetGame(fields, result) {
+function uncheckFields(fields, result) {
     fields.forEach(function(field) {
         uncheckField(field);
     });
-    result.innerHTML = '';
 }
 
 function uncheckField(field) {
@@ -89,10 +101,6 @@ function uncheckField(field) {
         'cancelable': true
     }));
 }
-
-// function isGameFinished(players) {
-//     return () || hasPlayerWon(players);
-// }
 
 function areAllValuesSet() {
     return elements('.board .field:not(:checked)').length === 0;
