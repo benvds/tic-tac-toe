@@ -33,10 +33,7 @@ document.addEventListener('DOMContentLoaded', function documentLoaded() {
                 field.parentElement.bgColor = 'white';
             }
 
-            checkGameState({
-                players: players,
-                fields: fields,
-            });
+            checkGameState(players, fields);
         });
     });
 
@@ -49,17 +46,31 @@ function nextPlayerIndex(players, index) {
     return ((players.length - 1) > index) ? index + 1 : 0;
 }
 
-// takes options with players, fields
-function checkGameState(options) {
-    if (isGameFinished(options.players)) {
-        options.fields.forEach(function(field) {
+function checkGameState(players, fields) {
+    if (isGameFinished(players)) {
+        fields.forEach(function(field) {
             field.disabled = true;
         });
     } else {
-        options.fields.forEach(function(field) {
+        fields.forEach(function(field) {
             field.disabled = false;
         });
     }
+}
+
+function resetGame(fields) {
+    fields.forEach(function(field) {
+        uncheckField(field);
+    });
+}
+
+function uncheckField(field) {
+    field.checked = false;
+    field.dispatchEvent(new Event('change', {
+        'view': window,
+        'bubbles': true,
+        'cancelable': true
+    }));
 }
 
 function isGameFinished(players) {
@@ -78,21 +89,6 @@ function hasPlayerWon(players) {
             || hasCompleteColumn(values)
             || hasCompleteDiagonal(values));
     }).length;
-}
-
-function resetGame(fields) {
-    fields.forEach(function(field) {
-        uncheckField(field);
-    });
-}
-
-function uncheckField(field) {
-    field.checked = false;
-    field.dispatchEvent(new Event('change', {
-        'view': window,
-        'bubbles': true,
-        'cancelable': true
-    }));
 }
 
 // returns a matrix of values
