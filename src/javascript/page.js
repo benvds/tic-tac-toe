@@ -1,5 +1,6 @@
 var util = require('./lib/util'),
-    $ = require('./lib/util').$;
+    dom = require('./lib/dom');
+    $ = require('./lib/dom').$;
     TicTacToe = require('./tictactoe');
 
 document.addEventListener('DOMContentLoaded', function documentLoaded() {
@@ -45,8 +46,8 @@ function inputFieldPosition(field) {
         parentTableRow = parentTableData.parentElement;
 
     return {
-        row: util.elementIndex(parentTableData),
-        column: util.elementIndex(parentTableRow)
+        row: dom.elementIndex(parentTableData),
+        column: dom.elementIndex(parentTableRow)
     };
 }
 

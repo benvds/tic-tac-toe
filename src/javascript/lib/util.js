@@ -7,14 +7,6 @@ function toArray(subject) {
     return slice.call(subject);
 }
 
-function $(selectors, subject) {
-    return toArray((subject || document).querySelectorAll(selectors));
-}
-
-function elementIndex(element) {
-    return indexOf.call(element.parentElement.children, element);
-}
-
 // returns true if collection is empty
 function isEmpty(collection) {
     return collection.length === 0;
@@ -43,13 +35,13 @@ function clone(source) {
 }
 
 var util = {
+    indexOf: indexOf,
+    slice: slice,
     isEmpty: isEmpty,
     negate: negate,
     every: every,
     clone: clone,
-    toArray: toArray,
-    $: $,
-    elementIndex: elementIndex
+    toArray: toArray
 };
 
 module.exports = util;
