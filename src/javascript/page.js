@@ -1,24 +1,14 @@
-var _ = require('lodash'),
+var util = require('./lib/util'),
+    $ = require('./lib/util').$;
     TicTacToe = require('./tictactoe');
-
-var indexOf = Array.prototype.indexOf,
-    slice = Array.prototype.slice;
-
-function toArray(subject) {
-    return slice.call(subject);
-}
-
-function elements(selectors, subject) {
-    return toArray((subject || document).querySelectorAll(selectors));
-}
 
 document.addEventListener('DOMContentLoaded', function documentLoaded() {
     var UI = {
-            BOARD: elements('.board')[0],
-            FIELDS: elements('.field'),
-            TURN: elements('.turn')[0],
-            RESET_BUTTON: elements('.reset')[0],
-            RESULT: elements('.result')[0]
+            BOARD: $('.board')[0],
+            FIELDS: $('.field'),
+            TURN: $('.turn')[0],
+            RESET_BUTTON: $('.reset')[0],
+            RESULT: $('.result')[0]
         },
         state = TicTacToe.newState();
 
@@ -55,16 +45,13 @@ function inputFieldPosition(field) {
         parentTableRow = parentTableData.parentElement;
 
     return {
-        row: elementIndex(parentTableData),
-        column: elementIndex(parentTableRow)
+        row: util.elementIndex(parentTableData),
+        column: util.elementIndex(parentTableRow)
     };
 }
 
-function elementIndex(element) {
-    return indexOf.call(element.parentElement.children, element);
-}
-
 function updateUI(UI, state) {
+    // TODO retrieve stateName (won/draw/playing) and handle with functions
     if (TicTacToe.winner(state)) {
         UI.RESULT.innerHTML = 'winner: ' + TicTacToe.winner(state);
         UI.TURN.innerHTML = '';
@@ -75,6 +62,7 @@ function updateUI(UI, state) {
         disableFields(UI.FIELDS);
     } else {
         UI.TURN.innerHTML = TicTacToe.currentPlayer(state);
+        UI.RESULT.innerHTML = '';
     }
 }
 

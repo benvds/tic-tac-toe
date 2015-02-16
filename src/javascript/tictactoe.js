@@ -1,17 +1,9 @@
-var _ = require('lodash');
-
-// transposes a matrix (swaps rows and columns)
-function transpose(matrix) {
-    return matrix.map(function(row, index, matrix) {
-        return matrix.map(function(row) {
-            return row[index];
-        });
-    });
-}
+var util = require('./lib/util'),
+    matrix = require('./lib/matrix');
 
 function isDraw(state) {
-    return _.every(_.flatten(state.values), function(item) {
-        return !_.isNull(item);
+    return util.every(matrix.flatten(state.values), function(item) {
+        return item !== null;
     });
 }
 
@@ -19,44 +11,44 @@ function winner(state) {
     return state.players.filter(function(player) {
         var values = mapToBoolean(state.values, player);
 
-        return (containsAllTrue(values)
+        return (hasCompleteRow(values)
             || hasCompleteColumn(values)
             || hasCompleteDiagonal(values));
     })[0];
 }
 
-function mapToBoolean(matrix, value) {
-    return matrix.map(function(row) {
-        return row.map(function(item) {
-            return (item === value);
+function mapToBoolean(collection, value) {
+    return matrix.mapItems(collection, function(item) {
+        return (item === value);
+    });
+}
+
+function hasCompleteRow(collection) {
+    return collection.some(function(row) {
+        return util.every(row, function(item) {
+            return item === true;
         });
     });
 }
 
-function containsAllTrue(matrix) {
-    return _.some(matrix, function(row) {
-        return !_.contains(row, false);
-    });
-}
-
 function hasCompleteColumn(values) {
-    return containsAllTrue(transpose(values));
+    return hasCompleteRow(matrix.transpose(values));
 }
 
 function hasCompleteDiagonal(values) {
-    return containsAllTrue([diagonalValuesDescending(values),
+    return hasCompleteRow([diagonalValuesDescending(values),
                           diagonalValuesAscending(values)]);
 }
 
-function diagonalValuesDescending(matrix) {
-    return matrix.map(function(row, index) {
+function diagonalValuesDescending(collection) {
+    return collection.map(function(row, index) {
         return row[index];
     });
 }
 
-function diagonalValuesAscending(matrix) {
-    return matrix.map(function(row, index) {
-        return row[(matrix.length - 1) - index];
+function diagonalValuesAscending(collection) {
+    return collection.map(function(row, index) {
+        return row[(collection.length - 1) - index];
     });
 }
 
@@ -70,7 +62,7 @@ function nextPlayerIndex(state) {
 }
 
 function claimPosition(state, position) {
-    var newState = _.clone(state, true);
+    var newState = util.clone(state, true);
 
     newState.values[position.row][position.column] = currentPlayer(state);
     newState.currentPlayerIndex = nextPlayerIndex(state);
