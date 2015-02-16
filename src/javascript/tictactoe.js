@@ -9,11 +9,11 @@ function isDraw(state) {
 
 function winner(state) {
     return state.players.filter(function(player) {
-        var values = mapToBoolean(state.values, player);
+        var playerPositions = mapToBoolean(state.values, player);
 
-        return (hasCompleteRow(values)
-            || hasCompleteColumn(values)
-            || hasCompleteDiagonal(values));
+        return (hasCompleteRow(playerPositions)
+            || hasCompleteColumn(playerPositions)
+            || hasCompleteDiagonal(playerPositions));
     })[0];
 }
 

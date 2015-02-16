@@ -52,7 +52,7 @@ function inputFieldPosition(field) {
 }
 
 function updateUI(UI, state) {
-    // TODO retrieve stateName (won/draw/playing) and handle with functions
+    // TODO retrieve stateName (won/draw/playing) and handle with gameStateHandlers
     if (TicTacToe.winner(state)) {
         UI.RESULT.innerHTML = 'winner: ' + TicTacToe.winner(state);
         UI.TURN.innerHTML = '';
