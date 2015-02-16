@@ -1,5 +1,3 @@
-var _ = require('lodash');
-
 var indexOf = Array.prototype.indexOf,
     slice = Array.prototype.slice;
 
@@ -28,10 +26,21 @@ function every(collection, predicate) {
     return isEmpty(collection.filter(negate(predicate)));
 }
 
-// returns shallow clone of source object
+// returns clone of source object
 function clone(source) {
-    // TODO replace lodash with 6to5/babeljs Object.assign
-    return _.assign({}, source);
+    if (source == null || typeof(source) != 'object') {
+        return source;
+    }
+
+    var obj = source.constructor();
+
+    for(var key in source) {
+        if(source.hasOwnProperty(key)) {
+            obj[key] = clone(source[key]);
+        }
+    }
+
+    return obj;
 }
 
 var util = {
