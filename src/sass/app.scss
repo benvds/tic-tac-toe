@@ -1,0 +1,26 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    font-family: sans-serif;
+}
+
+header {
+    display: flex;
+    align-items: center;
+
+}
+
+button {
+    font-size: 1rem;
+    padding: .5rem 1rem;
+}
+
+.state {
+    flex: 1;
+    padding: 0 1rem;
+    text-align: center;
+}

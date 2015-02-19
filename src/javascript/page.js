@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function documentLoaded() {
     var UI = {
             BOARD: $('.board')[0],
             FIELDS: $('.field'),
-            TURN: $('.turn')[0],
+            STATE: $('.state')[0],
             RESET_BUTTON: $('.reset')[0],
             RESULT: $('.result')[0]
         },
@@ -54,16 +54,13 @@ function inputFieldPosition(field) {
 function updateUI(UI, state) {
     // TODO retrieve stateName (won/draw/playing) and handle with gameStateHandlers
     if (TicTacToe.winner(state)) {
-        UI.RESULT.innerHTML = 'winner: ' + TicTacToe.winner(state);
-        UI.TURN.innerHTML = '';
+        UI.STATE.innerHTML = 'winner: ' + TicTacToe.winner(state);
         disableFields(UI.FIELDS);
     } else if (TicTacToe.isDraw(state)) {
-        UI.RESULT.innerHTML = 'draw';
-        UI.TURN.innerHTML = '';
+        UI.STATE.innerHTML = 'draw';
         disableFields(UI.FIELDS);
     } else {
-        UI.TURN.innerHTML = TicTacToe.currentPlayer(state);
-        UI.RESULT.innerHTML = '';
+        UI.STATE.innerHTML = 'Turn: ' + TicTacToe.currentPlayer(state);
     }
 }
 
