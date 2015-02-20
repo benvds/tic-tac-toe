@@ -1,10 +1,32 @@
 var util = require('./lib/util'),
     matrix = require('./lib/matrix');
 
-function isDraw(state) {
-    return util.every(matrix.flatten(state.values), function(item) {
-        return item !== null;
-    });
+var TicTacToe = {
+    newState: newState,
+    stateName: stateName,
+    winner: winner,
+    currentPlayer: currentPlayer,
+    claimPosition: claimPosition
+};
+
+function newState() {
+    return {
+        players: ['red', 'blue'],
+        currentPlayerIndex: 0,
+        values: [[null, null, null],
+            [null, null, null],
+            [null, null, null]]
+    };
+}
+
+function stateName(state) {
+    if (winner(state)) {
+        return 'WON';
+    } else if (isDraw(state)) {
+        return 'DRAW';
+    } else {
+        return 'PLAYING';
+    }
 }
 
 function winner(state) {
@@ -15,6 +37,25 @@ function winner(state) {
             || hasCompleteColumn(playerPositions)
             || hasCompleteDiagonal(playerPositions));
     })[0];
+}
+
+function currentPlayer(state) {
+    return state.players[state.currentPlayerIndex];
+}
+
+function claimPosition(state, position) {
+    var newState = util.clone(state, true);
+
+    newState.values[position.row][position.column] = currentPlayer(state);
+    newState.currentPlayerIndex = nextPlayerIndex(state);
+
+    return newState;
+}
+
+function isDraw(state) {
+    return util.every(matrix.flatten(state.values), function(item) {
+        return item !== null;
+    });
 }
 
 function mapToBoolean(collection, value) {
@@ -52,38 +93,9 @@ function diagonalValuesAscending(collection) {
     });
 }
 
-function currentPlayer(state) {
-    return state.players[state.currentPlayerIndex];
-}
-
 function nextPlayerIndex(state) {
     return ((state.players.length - 1) > state.currentPlayerIndex) ?
         state.currentPlayerIndex + 1 : 0;
 }
-
-function claimPosition(state, position) {
-    var newState = util.clone(state, true);
-
-    newState.values[position.row][position.column] = currentPlayer(state);
-    newState.currentPlayerIndex = nextPlayerIndex(state);
-
-    return newState;
-}
-
-var TicTacToe = {
-    newState: function() {
-        return {
-            players: ['red', 'blue'],
-            currentPlayerIndex: 0,
-            values: [[null, null, null],
-                [null, null, null],
-                [null, null, null]]
-        };
-    },
-    winner: winner,
-    isDraw: isDraw,
-    currentPlayer: currentPlayer,
-    claimPosition: claimPosition
-};
 
 module.exports = TicTacToe;
