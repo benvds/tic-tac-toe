@@ -1,13 +1,16 @@
 {
-  "name": "tic-tac-toe",
-  "version": "0.1.0",
-  "description": "Tic-Tac-Toe game",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/benvds/tic-tac-toe.git"
-  },
-  "devDependencies": {
-    "node-static": "^0.7.6"
-  },
-  "dependencies": {}
+    "name": "tic-tac-toe",
+    "version": "0.1.0",
+    "description": "Tic-Tac-Toe game",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/benvds/tic-tac-toe.git"
+    },
+    "scripts": {
+        "start": "static src"
+    },
+    "devDependencies": {
+        "node-static": "^0.7.6"
+    },
+    "dependencies": {}
 }
