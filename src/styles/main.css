@@ -3,7 +3,9 @@
 }
 
 body {
+    display: -webkit-flex;
     display: flex;
+    -webkit-flex-direction: column;
     flex-direction: column;
     width: 100vw;
     height: 100vh;
@@ -13,6 +15,7 @@ body {
 }
 
 header {
+    display: -webkit-flex;
     display: flex;
     align-items: center;
     padding: 1rem;
@@ -24,23 +27,30 @@ button {
 }
 
 .state {
+    -webkit-flex: 1;
     flex: 1;
     padding: 0 1rem;
     text-align: center;
 }
 
 .board {
+    -webkit-flex: 1;
     flex: 1;
+    display: -webkit-flex;
     display: flex;
+    -webkit-flex-direction: column;
     flex-direction: column;
 }
 
 .row {
+    -webkit-flex-grow: 1;
     flex-grow: 1;
+    display: -webkit-flex;
     display: flex;
 }
 
 .field {
+    -webkit-flex-grow: 1;
     flex-grow: 1;
     border: 1px solid black;
     cursor: pointer;
