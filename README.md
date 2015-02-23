@@ -2,4 +2,4 @@
 
 ## Run
 
-    npm start
+Just open `src/index.html` in a browser. That's all.

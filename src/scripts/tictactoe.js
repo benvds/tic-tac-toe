@@ -1,101 +1,98 @@
-var util = require('./lib/util'),
-    matrix = require('./lib/matrix');
-
-var TicTacToe = {
-    newState: newState,
-    stateName: stateName,
-    winner: winner,
-    currentPlayer: currentPlayer,
-    claimPosition: claimPosition
-};
-
-function newState() {
-    return {
-        players: ['red', 'blue'],
-        currentPlayerIndex: 0,
-        values: [[null, null, null],
-            [null, null, null],
-            [null, null, null]]
+(function(window, util, matrix) {
+    var TicTacToe = window.TicTacToe = {
+        newState: newState,
+        stateName: stateName,
+        winner: winner,
+        currentPlayer: currentPlayer,
+        claimPosition: claimPosition
     };
-}
 
-function stateName(state) {
-    if (winner(state)) {
-        return 'WON';
-    } else if (isDraw(state)) {
-        return 'DRAW';
-    } else {
-        return 'PLAYING';
+    function newState() {
+        return {
+            players: ['red', 'blue'],
+            currentPlayerIndex: 0,
+            values: [[null, null, null],
+                [null, null, null],
+                [null, null, null]]
+        };
     }
-}
 
-function winner(state) {
-    return state.players.filter(function(player) {
-        var playerPositions = mapToBoolean(state.values, player);
+    function stateName(state) {
+        if (winner(state)) {
+            return 'WON';
+        } else if (isDraw(state)) {
+            return 'DRAW';
+        } else {
+            return 'PLAYING';
+        }
+    }
 
-        return (hasCompleteRow(playerPositions)
-            || hasCompleteColumn(playerPositions)
-            || hasCompleteDiagonal(playerPositions));
-    })[0];
-}
+    function winner(state) {
+        return state.players.filter(function(player) {
+            var playerPositions = mapToBoolean(state.values, player);
 
-function currentPlayer(state) {
-    return state.players[state.currentPlayerIndex];
-}
+            return (hasCompleteRow(playerPositions)
+                || hasCompleteColumn(playerPositions)
+                || hasCompleteDiagonal(playerPositions));
+        })[0];
+    }
 
-function claimPosition(state, position) {
-    var newState = util.clone(state, true);
+    function currentPlayer(state) {
+        return state.players[state.currentPlayerIndex];
+    }
 
-    newState.values[position.row][position.column] = currentPlayer(state);
-    newState.currentPlayerIndex = nextPlayerIndex(state);
+    function claimPosition(state, position) {
+        var newState = util.clone(state, true);
 
-    return newState;
-}
+        newState.values[position.row][position.column] = currentPlayer(state);
+        newState.currentPlayerIndex = nextPlayerIndex(state);
 
-function isDraw(state) {
-    return util.every(matrix.flatten(state.values), function(item) {
-        return item !== null;
-    });
-}
+        return newState;
+    }
 
-function mapToBoolean(collection, value) {
-    return matrix.mapItems(collection, function(item) {
-        return (item === value);
-    });
-}
-
-function hasCompleteRow(collection) {
-    return collection.some(function(row) {
-        return util.every(row, function(item) {
-            return item === true;
+    function isDraw(state) {
+        return util.every(matrix.flatten(state.values), function(item) {
+            return item !== null;
         });
-    });
-}
+    }
 
-function hasCompleteColumn(values) {
-    return hasCompleteRow(matrix.transpose(values));
-}
+    function mapToBoolean(collection, value) {
+        return matrix.mapItems(collection, function(item) {
+            return (item === value);
+        });
+    }
 
-function hasCompleteDiagonal(values) {
-    return hasCompleteRow([diagonalValuesDescending(values),
-                          diagonalValuesAscending(values)]);
-}
+    function hasCompleteRow(collection) {
+        return collection.some(function(row) {
+            return util.every(row, function(item) {
+                return item === true;
+            });
+        });
+    }
 
-function diagonalValuesDescending(collection) {
-    return collection.map(function(row, index) {
-        return row[index];
-    });
-}
+    function hasCompleteColumn(values) {
+        return hasCompleteRow(matrix.transpose(values));
+    }
 
-function diagonalValuesAscending(collection) {
-    return collection.map(function(row, index) {
-        return row[(collection.length - 1) - index];
-    });
-}
+    function hasCompleteDiagonal(values) {
+        return hasCompleteRow([diagonalValuesDescending(values),
+                              diagonalValuesAscending(values)]);
+    }
 
-function nextPlayerIndex(state) {
-    return ((state.players.length - 1) > state.currentPlayerIndex) ?
-        state.currentPlayerIndex + 1 : 0;
-}
+    function diagonalValuesDescending(collection) {
+        return collection.map(function(row, index) {
+            return row[index];
+        });
+    }
 
-module.exports = TicTacToe;
+    function diagonalValuesAscending(collection) {
+        return collection.map(function(row, index) {
+            return row[(collection.length - 1) - index];
+        });
+    }
+
+    function nextPlayerIndex(state) {
+        return ((state.players.length - 1) > state.currentPlayerIndex) ?
+            state.currentPlayerIndex + 1 : 0;
+    }
+})(window, window.util, window.matrix);
