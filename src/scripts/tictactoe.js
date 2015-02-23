@@ -51,7 +51,7 @@
     }
 
     function isDraw(state) {
-        return util.every(matrix.flatten(state.values), function(item) {
+        return util.every(util.flatMap(state.values), function(item) {
             return item !== null;
         });
     }

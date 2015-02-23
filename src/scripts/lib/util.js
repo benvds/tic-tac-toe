@@ -27,6 +27,13 @@
         return isEmpty(collection.filter(negate(predicate)));
     }
 
+    // return a one dimensional array containing all the items
+    function flatMap(collection) {
+        return collection.reduce(function(accumulator, row) {
+            return accumulator.concat(row);
+        }, []);
+    }
+
     // returns clone of source object
     function clone(source) {
         if (source == null || typeof(source) != 'object') {
@@ -47,6 +54,7 @@
     var util = window.util = {
         indexOf: indexOf,
         slice: slice,
+        flatMap: flatMap,
         isEmpty: isEmpty,
         negate: negate,
         every: every,
