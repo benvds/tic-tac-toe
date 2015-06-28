@@ -80,6 +80,7 @@
 
     function uncheckField(field) {
         field.checked = false;
+        field.disabled = false;
         field.dispatchEvent(new Event('change', {
             'view': window,
             'bubbles': true,
