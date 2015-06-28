@@ -1,10 +1,11 @@
 # Tic-Tac-Toe
 
-Tic-Tac-Toe game implemented using various approaches:
+Just a test for various front-end development approaches:
 
- - html leading
- - state leading
+ - html leading (functional style)
+ - state leading (functional style)
+ - protoype
 
 ## Run
 
-Just open the html files under `src` in a browser. That's all.
+Open the html files under `src` in a browser. That's all.
