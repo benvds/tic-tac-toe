@@ -21,20 +21,20 @@ document.addEventListener('DOMContentLoaded', function documentLoaded() {
         currentPlayerIndex: 0
     };
     var ui = {
-        turn: elements('.turn')[0],
-        fields: elements('.board .field'),
+        // turn: elements('.turn')[0],
+        fields: elements('.field'),
         resetButton: elements('.reset')[0],
-        result: elements('.result')[0]
+        state: elements('.state')[0]
     };
 
     ui.fields.forEach(function(field) {
         field.addEventListener('change', function() {
-            handleFieldChange(game, ui, field)
+            handleFieldChange(game, ui, field);
         });
     });
 
     ui.resetButton.addEventListener('click', function() {
-        uncheckFields(ui.fields, ui.result);
+        uncheckFields(ui.fields, ui.state);
         checkGameState(game, ui);
     });
 
@@ -45,12 +45,12 @@ function handleFieldChange(game, ui, field) {
     if (field.checked) {
         field.value = currentPlayer(game);
         field.disabled = true;
-        field.parentElement.bgColor = currentPlayer(game);
+        field.parentElement.style.backgroundColor = currentPlayer(game);
         game.currentPlayerIndex = nextPlayerIndex(game);
     } else {
         field.value = '';
         field.disabled = false;
-        field.parentElement.bgColor = 'white';
+        field.parentElement.style.backgroundColor = 'white';
     }
 
     checkGameState(game, ui);
@@ -69,15 +69,15 @@ function checkGameState(game, ui) {
     var winner = hasPlayerWon(game.players);
 
     if (winner) {
-        ui.result.innerHTML = 'winner: ' + winner;
-        ui.turn.innerHTML = '';
+        ui.state.innerHTML = 'winner: ' + winner;
+        // ui.turn.innerHTML = '';
         disableFields(ui.fields);
     } else if (areAllValuesSet()) {
-        ui.result.innerHTML = 'draw';
-        ui.turn.innerHTML = '';
+        ui.state.innerHTML = 'draw';
+        // ui.turn.innerHTML = '';
         disableFields(ui.fields);
     } else {
-        ui.turn.innerHTML = currentPlayer(game);
+        ui.state.innerHTML = currentPlayer(game);
     }
 }
 
@@ -87,7 +87,7 @@ function disableFields(fields) {
     });
 }
 
-function uncheckFields(fields, result) {
+function uncheckFields(fields) {
     fields.forEach(function(field) {
         uncheckField(field);
     });
@@ -118,7 +118,7 @@ function hasPlayerWon(players) {
 
 // returns a matrix of values
 function playerValues(player) {
-    return elements('.board tr').map(function(row) {
+    return elements('.row').map(function(row) {
         return rowValues(row, player);
     });
 }

@@ -1,37 +1,56 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Tic Tac Toe</title>
     <link rel="stylesheet" href="../shared/main.css" />
-  </head>
+    <style type="text/css" media="all">
+        .row > div {
+            display: -webkit-flex;
+            display: flex;
+            -webkit-flex-grow: 1;
+            flex-grow: 1;
+            border: 1px solid black;
+            -webkit-align-items: center;
+            align-items: center;
+            -webkit-justify-content: center;
+            justify-content: center;
+        }
+        .field {
+            -webkit-flex-grow: 0;
+            flex-grow: 0;
+        }
+    </style>
+</head>
+<body>
 
-  <body>
-    <h1>Tic Tac Toe</h1>
+    <header>
+        <h1>Tic Tac Toe</h1>
+        <div class="state"></div>
+        <button type="button" class="reset">reset</button>
+    </header>
 
-    <p>turn: <span class="turn"></span></p>
+    <div class="board">
+        <div class="row">
+            <div><input type="checkbox" class="field" /></div>
+            <div><input type="checkbox" class="field" /></div>
+            <div><input type="checkbox" class="field" /></div>
+        </div>
+        <div class="row">
+            <div><input type="checkbox" class="field" /></div>
+            <div><input type="checkbox" class="field" /></div>
+            <div><input type="checkbox" class="field" /></div>
+        </div>
+        <div class="row">
+            <div><input type="checkbox" class="field" /></div>
+            <div><input type="checkbox" class="field" /></div>
+            <div><input type="checkbox" class="field" /></div>
+        </div>
+    </div>
 
-    <table class="board" border="1" cellpadding="4">
-        <tr>
-            <td><input class="field" type="checkbox" /></td>
-            <td><input class="field" type="checkbox" /></td>
-            <td><input class="field" type="checkbox" /></td>
-        </tr>
-        <tr>
-            <td><input class="field" type="checkbox" /></td>
-            <td><input class="field" type="checkbox" /></td>
-            <td><input class="field" type="checkbox" /></td>
-        </tr>
-        <tr>
-            <td><input class="field" type="checkbox" /></td>
-            <td><input class="field" type="checkbox" /></td>
-            <td><input class="field" type="checkbox" /></td>
-        </tr>
-    </table>
-
-    <button type="button" class="reset">reset</button>
-
-    <p class="result"></p>
-
+    <!-- <script src="../shared/util.js"></script> -->
+    <!-- <script src="../shared/dom.js"></script> -->
+    <!-- <script src="../shared/matrix.js"></script> -->
+    <!-- <script src="./tictactoe.js"></script> -->
     <script src="./main.js"></script>
-  </body>
+</body>
 </html>
