@@ -1,165 +1,152 @@
-function toArray(subject) {
-    return Array.prototype.slice.call(subject);
-}
+(function(window, util, dom, $, matrix) {
 
-function elements(selectors, subject) {
-    return toArray((subject || document).querySelectorAll(selectors));
-}
+    document.addEventListener('DOMContentLoaded', function documentLoaded() {
+        var game = {
+            players: ['red', 'blue'],
+            currentPlayerIndex: 0
+        };
+        var ui = {
+            // turn: $('.turn')[0],
+            fields: $('.field'),
+            resetButton: $('.reset')[0],
+            state: $('.state')[0]
+        };
 
-// transposes a matrix (swaps rows and columns)
-function transpose(matrix) {
-    return matrix.map(function(row, index, matrix) {
-        return matrix.map(function(row) {
-            return row[index];
+        ui.fields.forEach(function(field) {
+            field.addEventListener('change', function() {
+                handleFieldChange(game, ui, field);
+            });
         });
-    });
-}
 
-document.addEventListener('DOMContentLoaded', function documentLoaded() {
-    var game = {
-        players: ['red', 'blue'],
-        currentPlayerIndex: 0
-    };
-    var ui = {
-        // turn: elements('.turn')[0],
-        fields: elements('.field'),
-        resetButton: elements('.reset')[0],
-        state: elements('.state')[0]
-    };
-
-    ui.fields.forEach(function(field) {
-        field.addEventListener('change', function() {
-            handleFieldChange(game, ui, field);
+        ui.resetButton.addEventListener('click', function() {
+            uncheckFields(ui.fields, ui.state);
+            checkGameState(game, ui);
         });
-    });
 
-    ui.resetButton.addEventListener('click', function() {
-        uncheckFields(ui.fields, ui.state);
         checkGameState(game, ui);
     });
 
-    checkGameState(game, ui);
-});
+    function handleFieldChange(game, ui, field) {
+        if (field.checked) {
+            field.value = currentPlayer(game);
+            field.disabled = true;
+            field.parentElement.style.backgroundColor = currentPlayer(game);
+            game.currentPlayerIndex = nextPlayerIndex(game);
+        } else {
+            field.value = '';
+            field.disabled = false;
+            field.parentElement.style.backgroundColor = 'white';
+        }
 
-function handleFieldChange(game, ui, field) {
-    if (field.checked) {
-        field.value = currentPlayer(game);
-        field.disabled = true;
-        field.parentElement.style.backgroundColor = currentPlayer(game);
-        game.currentPlayerIndex = nextPlayerIndex(game);
-    } else {
-        field.value = '';
-        field.disabled = false;
-        field.parentElement.style.backgroundColor = 'white';
+        checkGameState(game, ui);
     }
 
-    checkGameState(game, ui);
-}
-
-function currentPlayer(game) {
-    return game.players[game.currentPlayerIndex];
-}
-
-function nextPlayerIndex(game) {
-    return ((game.players.length - 1) > game.currentPlayerIndex) ?
-        game.currentPlayerIndex + 1 : 0;
-}
-
-function checkGameState(game, ui) {
-    var winner = hasPlayerWon(game.players);
-
-    if (winner) {
-        ui.state.innerHTML = 'winner: ' + winner;
-        // ui.turn.innerHTML = '';
-        disableFields(ui.fields);
-    } else if (areAllValuesSet()) {
-        ui.state.innerHTML = 'draw';
-        // ui.turn.innerHTML = '';
-        disableFields(ui.fields);
-    } else {
-        ui.state.innerHTML = currentPlayer(game);
+    function currentPlayer(game) {
+        return game.players[game.currentPlayerIndex];
     }
-}
 
-function disableFields(fields) {
-    fields.forEach(function(field) {
-        field.disabled = true;
-    });
-}
+    function nextPlayerIndex(game) {
+        return ((game.players.length - 1) > game.currentPlayerIndex) ?
+            game.currentPlayerIndex + 1 : 0;
+    }
 
-function uncheckFields(fields) {
-    fields.forEach(function(field) {
-        uncheckField(field);
-    });
-}
+    function checkGameState(game, ui) {
+        var winner = hasPlayerWon(game.players);
 
-function uncheckField(field) {
-    field.checked = false;
-    field.dispatchEvent(new Event('change', {
-        'view': window,
-        'bubbles': true,
-        'cancelable': true
-    }));
-}
+        if (winner) {
+            ui.state.innerHTML = 'winner: ' + winner;
+            // ui.turn.innerHTML = '';
+            disableFields(ui.fields);
+        } else if (areAllValuesSet()) {
+            ui.state.innerHTML = 'draw';
+            // ui.turn.innerHTML = '';
+            disableFields(ui.fields);
+        } else {
+            ui.state.innerHTML = currentPlayer(game);
+        }
+    }
 
-function areAllValuesSet() {
-    return elements('.board .field:not(:checked)').length === 0;
-}
+    function disableFields(fields) {
+        fields.forEach(function(field) {
+            field.disabled = true;
+        });
+    }
 
-function hasPlayerWon(players) {
-    return players.filter(function(player) {
-        var values = playerValues(player);
+    function uncheckFields(fields) {
+        fields.forEach(function(field) {
+            uncheckField(field);
+        });
+    }
 
-        return (hasCompleteRow(values)
-            || hasCompleteColumn(values)
-            || hasCompleteDiagonal(values));
-    })[0];
-}
+    function uncheckField(field) {
+        field.checked = false;
+        field.dispatchEvent(new Event('change', {
+            'view': window,
+            'bubbles': true,
+            'cancelable': true
+        }));
+    }
 
-// returns a matrix of values
-function playerValues(player) {
-    return elements('.row').map(function(row) {
-        return rowValues(row, player);
-    });
-}
+    function areAllValuesSet() {
+        return $('.board .field:not(:checked)').length === 0;
+    }
 
-// returns array of values from table row
-function rowValues(row, player) {
-    return elements('.field', row).map(function(field) {
-        return field.checked && field.value === player;
-    });
-}
+    function hasPlayerWon(players) {
+        return players.filter(function(player) {
+            var values = playerValues(player);
 
-function hasCompleteRow(values) {
-    return values.filter(function(row) {
-        return checkRow(row);
-    }).length;
-}
+            return (hasCompleteRow(values)
+                || hasCompleteColumn(values)
+                || hasCompleteDiagonal(values));
+        })[0];
+    }
 
-// returns if all row values are true
-function checkRow(row) {
-    return row.filter(function(value) {
-        return !value;
-    }).length === 0;
-}
+    // returns a matrix of values
+    function playerValues(player) {
+        return $('.row').map(function(row) {
+            return rowValues(row, player);
+        });
+    }
 
-function hasCompleteColumn(values) {
-    return hasCompleteRow(transpose(values));
-}
+    // returns array of values from table row
+    function rowValues(row, player) {
+        return $('.field', row).map(function(field) {
+            return field.checked && field.value === player;
+        });
+    }
 
-function hasCompleteDiagonal(values) {
-    return hasCompleteRow([diagonalValuesDescending(values),
-                          diagonalValuesAscending(values)]);
-}
+    function hasCompleteRow(values) {
+        return values.filter(function(row) {
+            return checkRow(row);
+        }).length;
+    }
 
-function diagonalValuesDescending(values) {
-    return values.map(function(row, index) {
-        return row[index];
-    });
-}
+    // returns if all row values are true
+    function checkRow(row) {
+        return row.filter(function(value) {
+            return !value;
+        }).length === 0;
+    }
 
-function diagonalValuesAscending(values) {
-    return values.map(function(row, index) {
-        return row[(values.length - 1) - index];
-    });
-}
+    function hasCompleteColumn(values) {
+        return hasCompleteRow(matrix.transpose(values));
+    }
+
+    function hasCompleteDiagonal(values) {
+        return hasCompleteRow([diagonalValuesDescending(values),
+                              diagonalValuesAscending(values)]);
+    }
+
+    function diagonalValuesDescending(values) {
+        return values.map(function(row, index) {
+            return row[index];
+        });
+    }
+
+    function diagonalValuesAscending(values) {
+        return values.map(function(row, index) {
+            return row[(values.length - 1) - index];
+        });
+    }
+
+})(window, window.util, window.dom, window.dom.$, window.matrix);
